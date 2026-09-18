@@ -17,7 +17,7 @@ def find_hash_sha256(init_str: str) -> bytes:
         raise
 
 
-def find_shortened_hash(init_hash: bytes, hash_len: int) -> bytes:
+def find_shortened_hash(init_hash: bytes, hash_len: int) -> int:
     """
     Функция для нахождения укороченного хэша
     Принимает:

@@ -1,6 +1,7 @@
 import json
 import random
 import string
+from typing import cast
 
 
 def generate_random_string(length: int) -> str:
@@ -21,18 +22,18 @@ def generate_random_string(length: int) -> str:
         raise
 
 
-def read_json_file(filepath: str) -> dict:
+def read_json_file(filepath: str) -> dict[str, object]:
     """
     Чтение .json файла по указанному пути в словарь.
-    Принимает:
-        filepath - путь до .json файла.
-    Возвращает:
-        - словарь со считанными из файла данными
     """
     try:
-        with open(filepath) as fp:
+        with open(filepath, encoding="utf-8") as fp:
             json_data = json.load(fp)
-        return json_data
+
+        if not isinstance(json_data, dict):
+            raise ValueError("Корневой элемент JSON должен быть объектом")
+
+        return cast(dict[str, object], json_data)
     except Exception as e:
         print(f"Не удалось открыть файл {filepath}: {e}")
         raise

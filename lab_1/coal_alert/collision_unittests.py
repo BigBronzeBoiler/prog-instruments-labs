@@ -21,7 +21,7 @@ class TestHashCollisionApp(unittest.TestCase):
         with self.assertRaises(ValueError):
             utils.generate_random_string(-5)
         with self.assertRaises(ValueError):
-            utils.generate_random_string("not_an_int")
+            utils.generate_random_string("not_an_int")  # pyright: ignore[reportArgumentType]
 
     def test_sha256_hashing(self):
         """
@@ -48,8 +48,12 @@ class TestHashCollisionApp(unittest.TestCase):
         Проверка на то, что функция поиска действительно находит коллизию
         """
         res = collisions.find_collision(hash_len=8, str_len=10, disable_tqdm=True)
-        self.assertIsNotNone(res)
+
+        if res is None:
+            self.fail("Коллизия не была найдена")
+
         s1, s2, h, attempts = res
+        self.assertGreater(attempts, 0)
         self.assertNotEqual(s1, s2)
 
         h1 = hash.find_shortened_hash(hash.find_hash_sha256(s1), 8)

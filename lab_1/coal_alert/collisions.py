@@ -1,4 +1,5 @@
 import math
+from collections.abc import Sequence
 
 from tqdm import tqdm
 
@@ -6,7 +7,9 @@ import hash
 import utils
 
 
-def find_collision(hash_len: int, str_len: int) -> tuple[str, str, int, int]:
+def find_collision(
+    hash_len: int, str_len: int, disable_tqdm: bool = False
+) -> tuple[str, str, int, int] | None:
     """
     Функция для поиска первой коллизии для заданных длин случайной строки и укороченного хэша
     Принимает:
@@ -16,10 +19,12 @@ def find_collision(hash_len: int, str_len: int) -> tuple[str, str, int, int]:
         - кортеж [строка1, строка2, их одинаковый укороченный хэш, номер попытки, на которой произошла коллизия]
     """
     try:
-        seen = {}
+        seen: dict[int, str] = {}
         max_attempts = (2**hash_len) + 1
 
-        for attempt in tqdm(range(1, max_attempts + 1), desc=f"{hash_len} бит", unit="строка"):
+        for attempt in tqdm(
+            range(1, max_attempts + 1), desc=f"{hash_len} бит", unit="строка", disable=disable_tqdm
+        ):
             s = utils.generate_random_string(str_len)
             h = hash.find_shortened_hash(hash.find_hash_sha256(s), hash_len)
 
@@ -34,7 +39,9 @@ def find_collision(hash_len: int, str_len: int) -> tuple[str, str, int, int]:
         raise
 
 
-def run_experiments(bits_list: tuple[int], experiments: int, str_len: int) -> dict:
+def run_experiments(
+    bits_list: Sequence[int], experiments: int, str_len: int
+) -> dict[int, dict[str, float]]:
     """
     Проведение серии экспериментов, сравнение с теорией и сбор метрик
     Принимает:
@@ -46,7 +53,7 @@ def run_experiments(bits_list: tuple[int], experiments: int, str_len: int) -> di
                     "theoretical": теоритическое кол-во попыток на нахождение коллизии}
     """
     print(f"Запуск {experiments} экспериментов\n")
-    results = {}
+    results: dict[int, dict[str, float]] = {}
 
     try:
         for bits in bits_list:

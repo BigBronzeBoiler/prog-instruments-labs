@@ -42,11 +42,27 @@ def main():
             case "gui":
                 gui.run_gui()
             case "cli":
+                if not isinstance(args.json_path, str):
+                    raise ValueError("Для режима CLI необходимо указать --json-path")
+
                 settings = utils.read_json_file(args.json_path)
 
-                bits = settings.get("bits")
+                raw_bits = settings.get("bits")
                 experiments = settings.get("experiments")
                 str_length = settings.get("str_length")
+
+                if not isinstance(raw_bits, list) or not all(
+                    isinstance(bit, int) for bit in raw_bits
+                ):
+                    raise ValueError("Параметр bits должен быть списком целых чисел")
+
+                if not isinstance(experiments, int):
+                    raise ValueError("Параметр experiments должен быть целым числом")
+
+                if not isinstance(str_length, int):
+                    raise ValueError("Параметр str_length должен быть целым числом")
+
+                bits = [bit for bit in raw_bits if isinstance(bit, int)]
 
                 collisions.run_experiments(bits, experiments, str_length)
             case "uni":
