@@ -27,8 +27,8 @@ def find_shortened_hash(init_hash: bytes, hash_len: int) -> bytes:
         - укороченный хэш
     """
     try:
-        val = int.from_bytes(init_hash[:4], 'big')
-        shortened_hash = val >> (32-hash_len)
+        val = int.from_bytes(init_hash[:4], "big")
+        shortened_hash = val >> (32 - hash_len)
         return shortened_hash
     except Exception as e:
         print("В процессе поиска укороченного хэша произошла ошибка:", e)

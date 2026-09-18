@@ -1,10 +1,23 @@
-import sys
 import math
-import collisions
+import sys
 
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QPushButton, QTextEdit, QProgressBar, QMessageBox)
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QPainter, QPixmap
+from PyQt5.QtWidgets import (
+    QApplication,
+    QHBoxLayout,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QSpinBox,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
+import collisions
 
 
 class ExperimentWorker(QThread):
@@ -27,41 +40,45 @@ class ExperimentWorker(QThread):
             for bits in self.bits_list:
                 total_attempts = 0
                 example_collision = None
-                
+
                 for i in range(self.experiments):
                     if self.isInterruptionRequested():
                         return
-                    
+
                     res = collisions.find_collision(bits, self.str_len)
                     if res:
                         attempts = res[-1]
                         total_attempts += attempts
-                    
+
                     current_step += 1
                     progress_percent = int((current_step / total_steps) * 100)
-                    self.progress_signal.emit(progress_percent, f"Тестирование {bits} бит... Шаг {i+1}/{self.experiments}")
-                
+                    self.progress_signal.emit(
+                        progress_percent,
+                        f"Тестирование {bits} бит... Шаг {i + 1}/{self.experiments}",
+                    )
+
                 avg_attempts = total_attempts / self.experiments
-                theoretical = math.sqrt(math.pi * (2 ** bits) / 2)
-                
+                theoretical = math.sqrt(math.pi * (2**bits) / 2)
+
                 results[bits] = {
                     "avg_practice": avg_attempts,
                     "theory": theoretical,
-                    "example": example_collision
+                    "example": example_collision,
                 }
-            
+
             self.finished_signal.emit(results)
         except Exception as e:
             self.error_signal.emit(str(e))
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("This app weren't no coal, it was a shining, glistening gem.")
         self.setMinimumSize(1000, 1000)
-        
+
         self.background_pixmap = QPixmap("CobsonStardust.png")
-        
+
         self.init_ui()
 
     def paintEvent(self, event):
@@ -77,7 +94,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(central_widget)
 
         config_layout = QHBoxLayout()
-        
+
         lbl_exp = QLabel("Экспериментов (гемчиков):")
         config_layout.addWidget(lbl_exp)
         self.spin_experiments = QSpinBox()
@@ -101,7 +118,7 @@ class MainWindow(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
-        
+
         self.lbl_status = QLabel("Готов к старту")
         self.lbl_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.lbl_status)
@@ -124,7 +141,7 @@ class MainWindow(QMainWindow):
         self.btn_start.setEnabled(False)
         self.txt_output.clear()
         self.progress_bar.setValue(0)
-        
+
         bits_list = [8, 12, 16]
         experiments = self.spin_experiments.value()
         str_len = self.spin_strlen.value()
@@ -142,20 +159,21 @@ class MainWindow(QMainWindow):
     def display_results(self, results):
         self.btn_start.setEnabled(True)
         self.lbl_status.setText("Гемчики успешно найдены (вычисления завершены)")
-        
+
         out = []
         out.append("-= GEM ALERT =-")
         for bits, data in results.items():
             out.append(f"\n- Результаты для {bits} бит:")
             out.append(f"  Практическое среднее число попыток: {data['avg_practice']:.2f}")
             out.append(f"  Теоретическое число попыток: {data['theory']:.2f}")
-        
+
         self.txt_output.setText("\n".join(out))
 
     def handle_error(self, e):
         self.btn_start.setEnabled(True)
         self.lbl_status.setText("Произошла ошибка(")
         QMessageBox.critical(self, "Критическое исключение", f"Произошел сбой: {e}")
+
 
 def run_gui():
     app = QApplication(sys.argv)

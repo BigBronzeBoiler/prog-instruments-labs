@@ -1,10 +1,11 @@
 import unittest
-import utils
-import hash
+
 import collisions
+import hash
+import utils
+
 
 class TestHashCollisionApp(unittest.TestCase):
-
     def test_random_string_generation_valid(self):
         """
         Проверка генерации строки правильной длины
@@ -35,12 +36,12 @@ class TestHashCollisionApp(unittest.TestCase):
         Проверка на попадание укороченного хэша в диапазон бит
         """
         h_bytes = hash.find_hash_sha256("hello")
-        
+
         for bits in [8, 12, 16]:
             short_h = hash.find_shortened_hash(h_bytes, bits)
             self.assertIsInstance(short_h, int)
             self.assertGreaterEqual(short_h, 0)
-            self.assertLess(short_h, 2 ** bits)
+            self.assertLess(short_h, 2**bits)
 
     def test_find_collision_logic(self):
         """
@@ -50,7 +51,7 @@ class TestHashCollisionApp(unittest.TestCase):
         self.assertIsNotNone(res)
         s1, s2, h, attempts = res
         self.assertNotEqual(s1, s2)
-        
+
         h1 = hash.find_shortened_hash(hash.find_hash_sha256(s1), 8)
         h2 = hash.find_shortened_hash(hash.find_hash_sha256(s2), 8)
         self.assertEqual(h1, h2)

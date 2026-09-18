@@ -1,6 +1,7 @@
-import string
 import json
 import random
+import string
+
 
 def generate_random_string(length: int) -> str:
     """
@@ -14,10 +15,11 @@ def generate_random_string(length: int) -> str:
         raise ValueError("Длина строки должна быть натуральным числом")
     try:
         chars = string.ascii_letters + string.digits
-        return ''.join(random.choices(chars, k=length))
+        return "".join(random.choices(chars, k=length))
     except Exception as e:
         print(f"Внутренняя ошибка при генерации строки: {e}")
         raise
+
 
 def read_json_file(filepath: str) -> dict:
     """
@@ -28,7 +30,7 @@ def read_json_file(filepath: str) -> dict:
         - словарь со считанными из файла данными
     """
     try:
-        with open(filepath, 'r') as fp:
+        with open(filepath) as fp:
             json_data = json.load(fp)
         return json_data
     except Exception as e:
