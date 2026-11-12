@@ -1,16 +1,15 @@
 import csv
-from typing import List
 
 from vars import PATTERNS
 
 
-def find_wrong_rows(filepath: str) -> List[str]:
+def find_wrong_rows(filepath: str) -> list[str]:
     """
     Возвращает номера строк CSV файла, не прошедших валидацию.
 
     Принимает:
     - filepath - путь до csv файла с данными
-        
+
     Возвращает:
     - список целочисленных номеров строк csv-файла, на которых были найдены ошибки валидации
     """

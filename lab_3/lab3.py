@@ -1,6 +1,5 @@
 import checksum
 import util
-
 from vars import csv_path
 
 
