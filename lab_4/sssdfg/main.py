@@ -41,45 +41,28 @@ def main():
         key_length = int(json_settings.get("key_length"))
 
         if args.generation:
-            mode = "generation"
-        else:
-            c_sym_key = util.read_file(sym_key_path)
-            sym_key = asym.decrypt_with_private_key(c_sym_key, sec_key_path)
-            if args.encryption:
-                mode = "encryption"
-            else:
-                mode = "decryption"
+            sym_key = keygen.volshebniy_kluch(key_length)
+            keygen.asym_keygen(pub_key_path, sec_key_path)
+            encrypted_key = asym.encrypt_with_public_key(sym_key, pub_key_path)
+            util.write_file(sym_key_path, encrypted_key)
+            return
+
+        encrypted_key = util.read_file(sym_key_path)
+        sym_key = asym.decrypt_with_private_key(encrypted_key, sec_key_path)
+
         if args.camellia:
-            algo = "camellia"
-        if args.aes:
-            algo = "aes"
-        match algo:
-            case "camellia":
-                match mode:
-                    case "generation":
-                        sym_key = keygen.volshebniy_kluch(key_length)
-                        keygen.asym_keygen(pub_key_path, sec_key_path)
-                        с_sym_key = asym.encrypt_with_public_key(sym_key, pub_key_path)
-                        util.write_file(sym_key_path, с_sym_key)
-                    case "encryption":
-                        c_text = sym.encrypt_data_camellia(init_file_path, sym_key)
-                        util.write_file(ciph_file_path, c_text)
-                    case "decryption":
-                        dc_text = sym.decrypt_data_camellia(ciph_file_path, sym_key)
-                        util.write_file(dec_file_path, dc_text)
-            case "aes":
-                match mode:
-                    case "generation":
-                        sym_key = keygen.volshebniy_kluch(key_length)
-                        keygen.asym_keygen(pub_key_path, sec_key_path)
-                        с_sym_key = asym.encrypt_with_public_key(sym_key, pub_key_path)
-                        util.write_file(sym_key_path, с_sym_key)
-                    case "encryption":
-                        c_text = sym.encrypt_data_aes(init_file_path, sym_key)
-                        util.write_file(ciph_file_path, c_text)
-                    case "decryption":
-                        dc_text = sym.decrypt_data_aes(ciph_file_path, sym_key)
-                        util.write_file(dec_file_path, dc_text)
+            encrypt = sym.encrypt_data_camellia
+            decrypt = sym.decrypt_data_camellia
+        elif args.aes:
+            encrypt = sym.encrypt_data_aes
+            decrypt = sym.decrypt_data_aes
+
+        if args.encryption:
+            ciphertext = encrypt(init_file_path, sym_key)
+            util.write_file(ciph_file_path, ciphertext)
+        else:
+            plaintext = decrypt(ciph_file_path, sym_key)
+            util.write_file(dec_file_path, plaintext)
 
     except Exception as e:
         print(f"В ходе работы произошла ошибка {e}")
