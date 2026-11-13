@@ -1,7 +1,9 @@
 import os
-import util
+
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+import util
 
 
 def encrypt_data_camellia(init_file: str, key: bytes) -> bytes:
@@ -15,8 +17,8 @@ def encrypt_data_camellia(init_file: str, key: bytes) -> bytes:
     """
     try:
         text = util.read_file(init_file)
-        padder = padding.ANSIX923(128).padder()   
-        padded_text = padder.update(text)+padder.finalize()
+        padder = padding.ANSIX923(128).padder()
+        padded_text = padder.update(text) + padder.finalize()
 
         iv = os.urandom(16)
         cipher = Cipher(algorithms.Camellia(key), modes.CBC(iv))
@@ -25,7 +27,7 @@ def encrypt_data_camellia(init_file: str, key: bytes) -> bytes:
         return iv + c_text
     except FileNotFoundError:
         raise FileNotFoundError(f"Не удалось открыть файл {init_file}, увы")
-    
+
 
 def decrypt_data_camellia(init_file: str, key: bytes) -> bytes:
     """
@@ -34,7 +36,7 @@ def decrypt_data_camellia(init_file: str, key: bytes) -> bytes:
     Принимает:
         init_file - путь до файла с шифротекстом
         key - ключ симметричного алгоритма
-    Возвращает расшифрованный текст.    
+    Возвращает расшифрованный текст.
     """
     try:
         iv_c_text = util.read_file(init_file)
@@ -62,8 +64,8 @@ def encrypt_data_aes(init_file: str, key: bytes) -> bytes:
     """
     try:
         text = util.read_file(init_file)
-        padder = padding.ANSIX923(128).padder()   
-        padded_text = padder.update(text)+padder.finalize()
+        padder = padding.ANSIX923(128).padder()
+        padded_text = padder.update(text) + padder.finalize()
 
         iv = os.urandom(16)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
@@ -72,7 +74,7 @@ def encrypt_data_aes(init_file: str, key: bytes) -> bytes:
         return iv + c_text
     except FileNotFoundError:
         raise FileNotFoundError(f"Не удалось открыть файл {init_file}, увы")
-    
+
 
 def decrypt_data_aes(init_file: str, key: bytes) -> bytes:
     """
@@ -81,7 +83,7 @@ def decrypt_data_aes(init_file: str, key: bytes) -> bytes:
     Принимает:
         init_file - путь до файла с шифротекстом
         key - ключ симметричного алгоритма
-    Возвращает расшифрованный текст.    
+    Возвращает расшифрованный текст.
     """
     try:
         iv_c_text = util.read_file(init_file)

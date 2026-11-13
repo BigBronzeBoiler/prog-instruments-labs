@@ -1,7 +1,8 @@
 import argparse
+
 import asym
-import sym
 import keygen
+import sym
 import util
 
 
@@ -12,17 +13,16 @@ def parse_args():
     -Путь до .json файла с настройками
     """
     parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group(required = True)
-    group.add_argument('-gen','--generation',help='Запускает режим генерации ключей')
-    group.add_argument('-enc','--encryption',help='Запускает режим шифрования')
-    group.add_argument('-dec','--decryption',help='Запускает режим дешифрования')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-gen", "--generation", help="Запускает режим генерации ключей")
+    group.add_argument("-enc", "--encryption", help="Запускает режим шифрования")
+    group.add_argument("-dec", "--decryption", help="Запускает режим дешифрования")
 
-    group2 = parser.add_mutually_exclusive_group(required = True)
-    group2.add_argument('-cam','--camellia',help='Использование алгоритма Camellia')
-    group2.add_argument('-aes','--aes',help='Использование алгоритма AES')
+    group2 = parser.add_mutually_exclusive_group(required=True)
+    group2.add_argument("-cam", "--camellia", help="Использование алгоритма Camellia")
+    group2.add_argument("-aes", "--aes", help="Использование алгоритма AES")
 
-    parser.add_argument('-jp', '--json_path', help='Путь до .json файла с настройками.')
-    
+    parser.add_argument("-jp", "--json_path", help="Путь до .json файла с настройками.")
 
     return parser.parse_args()
 
@@ -68,22 +68,22 @@ def main():
                         dc_text = sym.decrypt_data_camellia(ciph_file_path, sym_key)
                         util.write_file(dec_file_path, dc_text)
             case "aes":
-                    match mode:
-                        case "generation":
-                            sym_key = keygen.volshebniy_kluch(key_length)
-                            keygen.asym_keygen(pub_key_path, sec_key_path)
-                            с_sym_key = asym.encrypt_with_public_key(sym_key, pub_key_path)
-                            util.write_file(sym_key_path, с_sym_key)
-                        case "encryption":
-                            c_text = sym.encrypt_data_aes(init_file_path, sym_key)
-                            util.write_file(ciph_file_path, c_text)
-                        case "decryption":
-                            dc_text = sym.decrypt_data_aes(ciph_file_path, sym_key)
-                            util.write_file(dec_file_path, dc_text)
-        
-            
+                match mode:
+                    case "generation":
+                        sym_key = keygen.volshebniy_kluch(key_length)
+                        keygen.asym_keygen(pub_key_path, sec_key_path)
+                        с_sym_key = asym.encrypt_with_public_key(sym_key, pub_key_path)
+                        util.write_file(sym_key_path, с_sym_key)
+                    case "encryption":
+                        c_text = sym.encrypt_data_aes(init_file_path, sym_key)
+                        util.write_file(ciph_file_path, c_text)
+                    case "decryption":
+                        dc_text = sym.decrypt_data_aes(ciph_file_path, sym_key)
+                        util.write_file(dec_file_path, dc_text)
+
     except Exception as e:
-        print(f"В ходе работы произошла ошибка {e}")     
-            
+        print(f"В ходе работы произошла ошибка {e}")
+
+
 if __name__ == "__main__":
     main()

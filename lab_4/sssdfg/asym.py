@@ -1,7 +1,12 @@
-import util
-from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.serialization import load_pem_public_key, load_pem_private_key
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.serialization import (
+    load_pem_private_key,
+    load_pem_public_key,
+)
+
+import util
+
 
 def encrypt_with_public_key(text: bytes, public_key_path: str) -> bytes:
     """
@@ -14,7 +19,14 @@ def encrypt_with_public_key(text: bytes, public_key_path: str) -> bytes:
     try:
         public_bytes = util.read_file(public_key_path)
         public_key = load_pem_public_key(public_bytes)
-        c_text = public_key.encrypt(text, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),algorithm=hashes.SHA256(),label=None))
+        c_text = public_key.encrypt(
+            text,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
         return c_text
     except FileNotFoundError:
         raise FileNotFoundError(f"Не удалось открыть файл {public_key_path}, увы")
@@ -30,8 +42,18 @@ def decrypt_with_private_key(c_text: bytes, secret_key_path: str) -> bytes:
     """
     try:
         private_bytes = util.read_file(secret_key_path)
-        private_key = load_pem_private_key(private_bytes,password=None,)
-        dc_text = private_key.decrypt(c_text,padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),algorithm=hashes.SHA256(),label=None))
+        private_key = load_pem_private_key(
+            private_bytes,
+            password=None,
+        )
+        dc_text = private_key.decrypt(
+            c_text,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
         return dc_text
     except FileNotFoundError:
         raise FileNotFoundError(f"Не удалось открыть файл {secret_key_path}, увы")

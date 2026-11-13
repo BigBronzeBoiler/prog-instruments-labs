@@ -1,5 +1,7 @@
 import os
+
 from cryptography.hazmat.primitives.asymmetric import rsa
+
 import util
 
 
@@ -13,12 +15,13 @@ def volshebniy_kluch(key_length: int) -> bytes:
         - ключ заданной длины
     Для нестандартных значений длины возвращает ошибку.
     """
-    if (key_length in [128,192,256]):
-        return os.urandom(key_length//8)
+    if key_length in [128, 192, 256]:
+        return os.urandom(key_length // 8)
     else:
-        raise RuntimeError("Поддерживаются генерация ключей только длиной 128, 192, 256 битов.")
+        raise RuntimeError(
+            "Поддерживаются генерация ключей только длиной 128, 192, 256 битов."
+        )
 
-    
 
 def asym_keygen(public_filepath: str, private_filepath: str) -> None:
     """
@@ -36,5 +39,3 @@ def asym_keygen(public_filepath: str, private_filepath: str) -> None:
         return
     except FileNotFoundError:
         raise FileNotFoundError(f"Не удалось открыть файл {public_filepath}, увы")
-
-
